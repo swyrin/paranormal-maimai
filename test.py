@@ -31,7 +31,7 @@ with requests.Session() as session:
         MOI_LOGIN_URL,
         params={
             "site_id": "maimaidxex",
-            "redirect_url": "https://maimaidx-eng.com/maimai-mobile/aimeList",
+            "redirect_url": "https://maimaidx-eng.com/maimai-mobile/",
             "back_url": "https://maimai.sega.com/",
         },
     )
