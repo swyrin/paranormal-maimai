@@ -7,7 +7,7 @@ print("0. Press Ctrl+Shift+I in advance")
 print("1. Go to https://maimaidx-eng.com/maimai-mobile/home/ and login WITH SEGA ID if needed")
 print("\tIf you already logged in, logout and login again, we need some data not from already logged in sessions")
 print("2. Press Ctrl + Shift + I, go to the one with '/sid', move down to the 'Request Headers' section")
-print("3. You should see one with a long wall of text, copy it for the next prompt")
+print("3. You should see one 'COOKIE' with a long wall of text, copy it for the next prompt")
 print("Remarks: You should do it every time you run this script")
 COOKIE = input("So, can I ask for the cookie: ")
 
