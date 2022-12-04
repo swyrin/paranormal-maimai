@@ -1,0 +1,7 @@
+pytest
+pytest-cov
+pytest-asyncio
+pyright
+black
+isort
+pip
