@@ -2,10 +2,10 @@ import re
 
 import aiohttp
 from bs4 import BeautifulSoup, Tag, NavigableString
-from typing import List, Union, Optional
+from typing import Union, Optional
 from typing_extensions import Final, LiteralString
 
-from . import MaimaiUser, MaimaiTrack
+from models import MaimaiUser, MaimaiTrack
 
 __all__ = ["MaimaiSession"]
 
@@ -64,7 +64,11 @@ class MaimaiSession:
                 "back_url": "https://maimai.sega.com/",
             },
         ) as response:
-            url_with_ssid = response.history[1].url.human_repr()
+            try:
+                url_with_ssid = response.history[1].url.human_repr()
+            except IndexError:
+                raise ValueError("Invalid account provided")
+                
             self.ssid = self._parse_ssid(url_with_ssid)
 
     def _parse_ssid(self, url: str) -> str:
@@ -150,12 +154,12 @@ class MaimaiSession:
         
         return result
 
-    async def resolve_user_data(self) -> MaimaiUser:
+    async def resolve_user_data(self):
         self.must_be_logged_in()
         user_html = await self.get_html("GET", f"{self.HOME_URL}/home")
         
         username = self.get_tag(user_html, "div", {"class": "name_block f_l f_16"}).text
-        rating = self.get_tag(user_html, "div", {"class": "rating_block"}).text
+        rating: int = int(self.get_tag(user_html, "div", {"class": "rating_block"}).text)
         title = self.get_tag(user_html, "div", {"class": "trophy_inner_block f_13"}).text.replace("\n", "")
         title_rarity = self.get_tag(user_html, "div", {"class": re.compile(r"trophy_block trophy_([a-zA-Z]*) p_3 t_c f_0")})["class"][1][len("trophy_"):]
         stars = self.get_tag(user_html, "div", {"class": "p_l_10 f_l f_14"}).text
@@ -164,8 +168,11 @@ class MaimaiSession:
         avatar_url = self.get_tag(user_html, "img", {"class": "w_112 f_l"})["src"]
         tour_leader_image_url = self.get_tag(user_html, "img", {"class": "w_120 m_t_10 f_r"})["src"]
         
-        print(username, rating, title, title_rarity, stars, dan_level_image_url, season_level_image_url, avatar_url, tour_leader_image_url, sep="\n")
-        return MaimaiUser(username, rating)
+        user_data_html = await self.get_html("GET", f"{self.HOME_URL}/playerData")
+        playcount: int = int(self.get_tag(user_data_html, "div", {"class": "m_5 m_t_10 t_r f_12"}).text.replace("play count：", ""))
+        
+        return MaimaiUser(username, rating, title, title_rarity, stars, tour_leader_image_url,
+                          dan_level_image_url, season_level_image_url, avatar_url, playcount)
 
     def resole_play_data(self):
         self.must_be_logged_in()

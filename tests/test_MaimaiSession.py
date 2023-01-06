@@ -2,7 +2,7 @@ import json
 import pytest
 
 
-from models.MaimaiSession import MaimaiSession
+from session import MaimaiSession
 
 j = {}
 
