@@ -21,12 +21,8 @@ class MaimaiSession:
             "Content-Type": "application/x-www-form-urlencoded",
             "Connection": "keep-alive",
         }
-        self.session: aiohttp.ClientSession = aiohttp.ClientSession(
-            headers=self.headers
-        )
-        self.AUTH_URL: Final[
-            LiteralString
-        ] = "https://lng-tgk-aime-gw.am-all.net/common_auth/login"
+        self.session: aiohttp.ClientSession = aiohttp.ClientSession(headers=self.headers)
+        self.AUTH_URL: Final[LiteralString] = "https://lng-tgk-aime-gw.am-all.net/common_auth/login"
         self.HOME_URL: Final[LiteralString] = "https://maimaidx-eng.com/maimai-mobile"
 
     async def get_ssid_from_credentials(self, *, username: str, password: str) -> None:
@@ -68,7 +64,7 @@ class MaimaiSession:
                 url_with_ssid = response.history[1].url.human_repr()
             except IndexError:
                 raise ValueError("Invalid account provided")
-                
+
             self.ssid = self._parse_ssid(url_with_ssid)
 
     def _parse_ssid(self, url: str) -> str:
@@ -93,9 +89,7 @@ class MaimaiSession:
         if self.is_logged_in:
             raise RuntimeWarning("You already logged in")
 
-        async with self.session.get(
-            self.HOME_URL, params={"ssid": self.ssid}
-        ) as response:
+        async with self.session.get(self.HOME_URL, params={"ssid": self.ssid}) as response:
             text = await response.text()
             soup = BeautifulSoup(text, "html.parser")
             title = [*soup.find_all("title")][0].text
@@ -110,9 +104,7 @@ class MaimaiSession:
         """'Log-out' from the session. Returns True if logged out successfully."""
         self.must_be_logged_in()
 
-        self.session.headers[
-            "Referer"
-        ] = "https://maimaidx-eng.com/maimai-mobile/home/userOption/"
+        self.session.headers["Referer"] = "https://maimaidx-eng.com/maimai-mobile/home/userOption/"
         is_logged_out: bool = False
 
         async with self.session.get(f"{self.HOME_URL}/home/userOption/logout/?"):
@@ -129,9 +121,7 @@ class MaimaiSession:
 
     async def close_session(self) -> None:
         if self.is_logged_in:
-            raise RuntimeWarning(
-                "You are logged in, you sure that you wanna close the session?"
-            )
+            raise RuntimeWarning("You are logged in, you sure that you wanna close the session?")
 
         await self.session.close()
 
@@ -148,33 +138,46 @@ class MaimaiSession:
         """Find html text with given tag name and attributes"""
         soup = BeautifulSoup(html, "html.parser")
         result = soup.find(tag_name, attr)
-        
+
         if not result:
             raise RuntimeError("Unable to extract data")
-        
+
         return result
 
     async def resolve_user_data(self):
         self.must_be_logged_in()
         user_html = await self.get_html("GET", f"{self.HOME_URL}/home")
-        
+
         username = self.get_tag(user_html, "div", {"class": "name_block f_l f_16"}).text
         rating: int = int(self.get_tag(user_html, "div", {"class": "rating_block"}).text)
         title = self.get_tag(user_html, "div", {"class": "trophy_inner_block f_13"}).text.replace("\n", "")
-        title_rarity = self.get_tag(user_html, "div", {"class": re.compile(r"trophy_block trophy_([a-zA-Z]*) p_3 t_c f_0")})["class"][1][len("trophy_"):]
+        title_rarity = self.get_tag(
+            user_html, "div", {"class": re.compile(r"trophy_block trophy_([a-zA-Z]*) p_3 t_c f_0")}
+        )["class"][1][len("trophy_") :]
         stars = self.get_tag(user_html, "div", {"class": "p_l_10 f_l f_14"}).text
         dan_level_image_url = self.get_tag(user_html, "img", {"class": "h_35 f_l"})["src"]
         season_level_image_url = self.get_tag(user_html, "img", {"class": "p_l_10 h_35 f_l"})["src"]
         avatar_url = self.get_tag(user_html, "img", {"class": "w_112 f_l"})["src"]
         tour_leader_image_url = self.get_tag(user_html, "img", {"class": "w_120 m_t_10 f_r"})["src"]
-        
+
         user_data_html = await self.get_html("GET", f"{self.HOME_URL}/playerData")
-        playcount: int = int(self.get_tag(user_data_html, "div", {"class": "m_5 m_t_10 t_r f_12"}).text.replace("play count：", ""))
-        
-        return MaimaiUser(username, rating, title, title_rarity, stars, tour_leader_image_url,
-                          dan_level_image_url, season_level_image_url, avatar_url, playcount)
+        playcount: int = int(
+            self.get_tag(user_data_html, "div", {"class": "m_5 m_t_10 t_r f_12"}).text.replace("play count：", "")
+        )
+
+        return MaimaiUser(
+            username,
+            rating,
+            title,
+            title_rarity,
+            stars,
+            tour_leader_image_url,
+            dan_level_image_url,
+            season_level_image_url,
+            avatar_url,
+            playcount,
+        )
 
     def resole_play_data(self):
         self.must_be_logged_in()
         return None
-

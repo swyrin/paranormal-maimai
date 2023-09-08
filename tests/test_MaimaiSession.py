@@ -23,17 +23,10 @@ class TestMaiMaiSession:
 
     def test__parse_ssid_good(self):
         assert (
-            self.maimai._parse_ssid(
-                "https://maimaidx-eng.com/maimai-mobile?ssid=abcdefghijklmnopqrstuxwxyz"
-            )
+            self.maimai._parse_ssid("https://maimaidx-eng.com/maimai-mobile?ssid=abcdefghijklmnopqrstuxwxyz")
             == "abcdefghijklmnopqrstuxwxyz"
         )
-        assert (
-            self.maimai._parse_ssid(
-                "https://maimaidx-eng.com/maimai-mobile?ssid=0123456789"
-            )
-            == "0123456789"
-        )
+        assert self.maimai._parse_ssid("https://maimaidx-eng.com/maimai-mobile?ssid=0123456789") == "0123456789"
 
     def test__parse_ssid_bad(self):
         with pytest.raises(ValueError):
@@ -45,9 +38,7 @@ class TestMaiMaiSession:
         reason="No default placeholder",
     )
     async def test_get_ssid_from_credentials_good(self):
-        await self.maimai.get_ssid_from_credentials(
-            username=j["SID"], password=j["PWD"]
-        )
+        await self.maimai.get_ssid_from_credentials(username=j["SID"], password=j["PWD"])
 
     async def test_get_ssid_from_credentials_bad(self):
         with pytest.raises(IndexError):
@@ -82,9 +73,7 @@ class TestMaiMaiSession:
         reason="No default placeholder",
     )
     async def test_login_credentials_good(self):
-        await self.maimai.get_ssid_from_credentials(
-            username=j["SID"], password=j["PWD"]
-        )
+        await self.maimai.get_ssid_from_credentials(username=j["SID"], password=j["PWD"])
         assert await self.maimai.login() is True
 
     async def test_login_bad_ssid_provide(self):
@@ -104,9 +93,7 @@ class TestMaiMaiSession:
         reason="No default placeholder",
     )
     async def test_login_credentials_double_login(self):
-        await self.maimai.get_ssid_from_credentials(
-            username=j["SID"], password=j["PWD"]
-        )
+        await self.maimai.get_ssid_from_credentials(username=j["SID"], password=j["PWD"])
 
         with pytest.raises(RuntimeWarning):
             assert await self.maimai.login() is True
@@ -126,9 +113,7 @@ class TestMaiMaiSession:
         reason="No default placeholder",
     )
     async def test_login_credentials_login_double_logout(self):
-        await self.maimai.get_ssid_from_credentials(
-            username=j["SID"], password=j["PWD"]
-        )
+        await self.maimai.get_ssid_from_credentials(username=j["SID"], password=j["PWD"])
 
         with pytest.raises(RuntimeError):
             assert await self.maimai.login() is True
@@ -150,9 +135,7 @@ class TestMaiMaiSession:
         reason="No default placeholder",
     )
     async def test_one_session_credentials(self):
-        await self.maimai.get_ssid_from_credentials(
-            username=j["SID"], password=j["PWD"]
-        )
+        await self.maimai.get_ssid_from_credentials(username=j["SID"], password=j["PWD"])
 
         assert self.maimai.session.closed is False
 
@@ -181,9 +164,7 @@ class TestMaiMaiSession:
     )
     async def test_login_credentials_close_session(self):
         with pytest.raises(RuntimeWarning):
-            await self.maimai.get_ssid_from_credentials(
-                username=j["SID"], password=j["PWD"]
-            )
+            await self.maimai.get_ssid_from_credentials(username=j["SID"], password=j["PWD"])
             assert await self.maimai.login() is True
             await self.maimai.close_session()
 
