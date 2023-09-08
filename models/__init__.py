@@ -1,2 +1,2 @@
-from .MaimaiUser import *
 from .MaimaiTrack import *
+from .MaimaiUser import *

@@ -2,6 +2,7 @@ import asyncio
 
 from session import MaimaiSession
 
+
 username = input("What is your SEGA ID username: ")
 password = input("What is your SEGA ID password: ")
 

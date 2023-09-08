@@ -1,5 +1,6 @@
 from enum import Enum
 
+
 __all__ = ["MaimaiUser"]
 
 
@@ -17,7 +18,7 @@ class MaimaiUser:
     def __init__(
         self,
         username: str,
-        rating: str,
+        rating: int,
         title: str,
         title_rarity: str,
         stars: str,

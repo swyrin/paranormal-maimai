@@ -1,8 +1,8 @@
 import json
+
 import pytest
-
-
 from session import MaimaiSession
+
 
 j = {}
 
